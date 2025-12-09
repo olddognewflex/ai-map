@@ -60,7 +60,7 @@ This is enough for agents to act meaningfully smarter without burdening develope
 version: 1
 
 system:
-  name: edge-assets
+  name: user-assets
   type: service
   domain: assets
   language: typescript
@@ -78,8 +78,8 @@ boundaries:
 
 dependencies:
   internal:
-    - edge-accounts
-    - edge-globals
+    - user-accounts
+    - user-globals
   external:
     - mongodb.atlas
     - redis.cache
@@ -193,11 +193,3 @@ MIT License — free to use, modify, and integrate into your projects.
 Open an issue or discussion — this spec is designed for real-world iteration, and your use cases help shape future versions.
 
 ---
-
-If you'd like, I can:
-
-- Add badges (version, spec, status, license)  
-- Add a project logo  
-- Generate a GitHub org structure  
-- Create `.ai-map.yaml` templates for different project types  
-- Build the initial example repo layout  
