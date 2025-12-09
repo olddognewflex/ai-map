@@ -358,7 +358,7 @@ Anything derivable by tools should be automated.
 version: 1
 
 system:
-  name: edge-assets
+  name: user-assets
   type: service
   domain: assets
   language: typescript
@@ -376,8 +376,8 @@ boundaries:
 
 dependencies:
   internal:
-    - edge-accounts
-    - edge-globals
+    - user-accounts
+    - user-globals
   external:
     - mongodb.atlas
     - redis.cache
