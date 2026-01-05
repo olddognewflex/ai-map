@@ -1,0 +1,21 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  go-cli:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - run: go test ./...
+      - run: go build -o /tmp/ai-map ./cmd/ai-map
+      - run: /tmp/ai-map conformance --repo-root ../..
