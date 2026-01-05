@@ -1,0 +1,15 @@
+# Go build/test artifacts
+*.exe
+*.test
+*.out
+
+# Local build outputs (common)
+/ai-map
+/bin/
+/dist/
+
+# Workspace-local Go caches for sandboxed builds
+/.gocache/
+/.gopath/
+
+
