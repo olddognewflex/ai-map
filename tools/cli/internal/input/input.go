@@ -8,23 +8,16 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-
-	"github.com/spf13/pflag"
 )
 
 const (
-	// MaxYAMLBytes is a safety cap for reading YAML inputs. This is not a spec limit; it's a tooling safety limit.
+	// MaxYAMLBytes is a safety cap for reading YAML inputs.
 	MaxYAMLBytes int64 = 2 << 20 // 2 MiB
 )
 
 type Selection struct {
 	Dir       string
 	Recursive bool
-}
-
-func AddFlags(fs *pflag.FlagSet, sel *Selection) {
-	fs.StringVar(&sel.Dir, "dir", "", "Directory to scan for *.yml|*.yaml (non-recursive by default)")
-	fs.BoolVar(&sel.Recursive, "recursive", false, "Scan directories recursively (off by default)")
 }
 
 func SelectFiles(sel Selection, args []string) ([]string, error) {
@@ -69,6 +62,33 @@ func SelectFiles(sel Selection, args []string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func EnsureSelected(sel Selection, inputs []string) error {
+	if sel.Dir == "" && len(inputs) == 0 {
+		return errors.New("no input files provided")
+	}
+	return nil
+}
+
+func ReadFileWithLimit(path string, maxBytes int64) ([]byte, error) {
+	if maxBytes <= 0 {
+		return nil, errors.New("maxBytes must be > 0")
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if info.Size() > maxBytes {
+		return nil, fmt.Errorf("file too large (%d bytes > %d): %s", info.Size(), maxBytes, path)
+	}
+	return os.ReadFile(path)
 }
 
 func scanYAMLFiles(root string, recursive bool) ([]string, error) {
@@ -118,26 +138,6 @@ func scanYAMLFiles(root string, recursive bool) ([]string, error) {
 func isYAMLName(name string) bool {
 	n := strings.ToLower(name)
 	return strings.HasSuffix(n, ".yml") || strings.HasSuffix(n, ".yaml")
-}
-
-func ReadFileWithLimit(path string, maxBytes int64) ([]byte, error) {
-	if maxBytes <= 0 {
-		return nil, errors.New("maxBytes must be > 0")
-	}
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	info, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	if info.Size() > maxBytes {
-		return nil, fmt.Errorf("file too large (%d bytes > %d): %s", info.Size(), maxBytes, path)
-	}
-	return os.ReadFile(path)
 }
 
 

@@ -155,12 +155,12 @@ go run ./cmd/ai-map lint /path/to/.ai-map.yaml
 go run ./cmd/ai-map render /path/to/.ai-map.yaml
 ```
 
-### **• IDE / Editor Plugins**
+### **• IDE / Editor Plugins (Coming soon)**
 - Cursor  
 - Neovim  
 - VS Code  
 
-### **• MCP Server**
+### **• MCP Server (Coming Soon)**
 A system-level metadata provider for orchestrating multi-agent workflows.
 
 ---
