@@ -1,0 +1,72 @@
+name: Release CLI
+on:
+  push:
+    tags:
+      - "cli/v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: windows
+            goarch: arm64
+    defaults:
+      run:
+        working-directory: tools/cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#cli/}"
+          mkdir -p dist
+          BIN_NAME="ai-map"
+          if [ "${GOOS}" = "windows" ]; then BIN_NAME="ai-map.exe"; fi
+
+          go build -trimpath \
+            -ldflags "-s -w -X github.com/yourorg/ai-map/tools/cli/internal/version.Version=$VERSION -X github.com/yourorg/ai-map/tools/cli/internal/version.Commit=$GITHUB_SHA" \
+            -o "dist/${BIN_NAME}" ./cmd/ai-map
+
+      - name: Package
+        run: |
+          cd dist
+          OS="${{ matrix.goos }}"
+          ARCH="${{ matrix.goarch }}"
+          VERSION="${GITHUB_REF_NAME#cli/}"
+          if [ "$OS" = "windows" ]; then
+            zip "ai-map_${VERSION}_${OS}_${ARCH}.zip" ai-map.exe
+          else
+            tar -czf "ai-map_${VERSION}_${OS}_${ARCH}.tar.gz" ai-map
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-map_${{ matrix.goos }}_${{ matrix.goarch }}
+          path: tools/cli/dist/*
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/**/ai-map_*.tar.gz
+            dist/**/ai-map_*.zip

@@ -121,24 +121,47 @@ It includes:
 
 ---
 
-## 🧰 Tooling (Coming Soon)
+## 🧰 Tooling
 
-AI-Map will support:
+### **• CLI (`ai-map`)**
 
-### **• CLI Tools**
-- Validate `.ai-map.yaml`  
-- Generate graphs  
-- Export metadata for agents  
+This repo now includes an initial, production-safe Go CLI under `tools/cli/` (a nested Go module).
 
-### **• IDE / Editor Plugins**
+**Quickstart**
+
+```bash
+cd tools/cli
+go test ./...
+go run ./cmd/ai-map --help
+```
+
+**Commands**
+
+- **`ai-map validate`**: Validate YAML files against a JSON Schema.
+  - By default it looks for `spec/ai-map.schema.json` (not present in this repo yet).
+  - Use `--schema /absolute/or/relative/path/to/schema.json` to point at a schema file.
+- **`ai-map lint`**: Opinionated checks (minimal initial rules; e.g. required top-level fields like `version` and `system`).
+- **`ai-map render`**: Render Markdown docs (deterministic output).
+- **`ai-map types`**: Generate Go types (**MVP; wiring in-progress**).
+- **`ai-map conformance`**: Conformance runner (**stub; fixtures/golden tests will land later**).
+- **`ai-map scaffold`**: Create a new agent map folder skeleton (**stub; safe scaffolding will land later**).
+
+**Examples**
+
+```bash
+cd tools/cli
+go run ./cmd/ai-map validate --schema /path/to/ai-map.schema.json /path/to/.ai-map.yaml
+go run ./cmd/ai-map lint /path/to/.ai-map.yaml
+go run ./cmd/ai-map render /path/to/.ai-map.yaml
+```
+
+### **• IDE / Editor Plugins (Coming soon)**
 - Cursor  
 - Neovim  
 - VS Code  
 
-### **• MCP Server**
+### **• MCP Server (Coming Soon)**
 A system-level metadata provider for orchestrating multi-agent workflows.
-
-If you want to help build these, PRs are (or soon will be) welcome.
 
 ---
 
